@@ -31,20 +31,37 @@ enemy_y = []
 enemy_x_change = []
 enemy_y_change = []
 number_of_enemies = 5
+enemy_speed = 0.2
 
 for i in range(number_of_enemies):
     enemy_img.append(pygame.image.load("alien.png"))
     enemy_x.append(random.randint(0, 736))
     enemy_y.append(random.randint(30, 200))
-    enemy_x_change.append(0.3)
+    enemy_x_change.append(enemy_speed)
     enemy_y_change.append(30)
+
+# Meteorite variables
+meteorite_img = []
+meteorite_x = []
+meteorite_y = []
+meteorite_x_change = []
+meteorite_y_change = []
+meteorite_visible = False
+number_of_meteorites = 3
+
+for i in range(number_of_meteorites):
+    meteorite_img.append(pygame.image.load("meteorite.png"))
+    meteorite_x.append(random.randint(0, 736))
+    meteorite_y.append(random.randint(0, 200))
+    meteorite_x_change.append(0)
+    meteorite_y_change.append(0.1)
 
 # Bullet variables
 bullet_img = pygame.image.load("bullet.png")
 bullet_x = 0
 bullet_y = 536
 bullet_x_change = 0
-bullet_y_change = 1
+bullet_y_change = 2
 bullet_visible = False
 
 # Score variable
@@ -69,6 +86,12 @@ def show_score(x, y):
 # Show player on screen
 def player(x, y):
     screen.blit(player_img, (x, y))
+
+# Show meteorite on screen
+def meteorite(x, y, meteorite_index):
+    global meteorite_visible
+    meteorite_visible = False
+    screen.blit(meteorite_img[meteorite_index], (x, y))
 
 # Show enemy on screen
 def enemy(x, y, enemy_index):
@@ -130,6 +153,43 @@ while is_running:
     elif player_x >= 736:
         player_x = 736
 
+    # Validate meteorite visibility
+    if score >= 1:
+        meteorite_visible = True
+
+    #Loop through meteorites
+    for i in range(number_of_meteorites):
+        # Detect collision between meteorite and player
+        collision = detect_collision(meteorite_x[i], meteorite_y[i], player_x, player_y)
+        if collision:
+            game_over_text()
+            break
+
+        # Detect collision between bullet and meteorite
+        collision = detect_collision(meteorite_x[i], meteorite_y[i], bullet_x, bullet_y)    
+        if collision:
+            bullet_y = 500
+            bullet_visible = False
+            meteorite_y[i] = random.randint(0, 200)
+            meteorite_x[i] = random.randint(0, 736)
+
+        # Update meteorite position
+        if meteorite_visible:
+            meteorite_y[i] += meteorite_y_change[i]
+
+        # Set boundaries for meteorite
+        if meteorite_y[i] >= 600:
+            meteorite_y[i] = random.randint(0, 568)
+            meteorite_x[i] = random.randint(0, 736)
+            meteorite_visible = False
+
+        # Show meteorite on screen
+        if meteorite_y[i] <= 200:
+            meteorite_y[i] = random.randint(0, 200)
+            meteorite_visible = False
+        if meteorite_visible:
+            meteorite(meteorite_x[i], meteorite_y[i], i)
+
     # Loop through enemies
     for i in range (number_of_enemies):
         # Detect game over
@@ -142,12 +202,17 @@ while is_running:
         # Update enemy position
         enemy_x[i] += enemy_x_change[i]
 
+        if 10 <= score < 20:
+            enemy_speed = 0.3
+        elif score >= 20:
+            enemy_speed = 0.5
+
         # Set boundaries for enemy
         if enemy_x[i] <= 0:
-            enemy_x_change[i] += 0.3
+            enemy_x_change[i] = enemy_speed
             enemy_y[i] += enemy_y_change[i]
         elif enemy_x[i] >= 736:
-            enemy_x_change[i] -= 0.3
+            enemy_x_change[i] = -enemy_speed
             enemy_y[i] += enemy_y_change[i]
 
         # Detect collision
