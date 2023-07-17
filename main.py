@@ -85,13 +85,15 @@ is_returning = False
 def show_menu():
     menu_font = pygame.font.Font("freesansbold.ttf", 64)
     title_text = menu_font.render("Space Invaders", True, (255, 255, 255))
-    start_text = score_font.render("1. Iniciar juego", True, (255, 255, 255))
-    scoreboard_text = score_font.render("2. Ver scoreboard", True, (255, 255, 255))
-    credits_text = score_font.render("3. Créditos", True, (255, 255, 255))
+    start_text = score_font.render("1. New game", True, (255, 255, 255))
+    scoreboard_text = score_font.render("2. Scoreboard", True, (255, 255, 255))
+    credits_text = score_font.render("3. Credits", True, (255, 255, 255))
+    quit_text = score_font.render("4. Exit", True, (255, 255, 255))
     screen.blit(title_text, (200, 200))
     screen.blit(start_text, (300, 300))
     screen.blit(scoreboard_text, (300, 350))
     screen.blit(credits_text, (300, 400))
+    screen.blit(quit_text, (300, 450))
 
 
 # Show game over text
@@ -307,6 +309,7 @@ while is_running:
                     bullet_visible = False
                     meteorite_y[i] = 0
                     meteorite_x[i] = random.randint(0, 736)
+                    score += 1
 
                 # Update meteorite position
                 if meteorite_visible:
